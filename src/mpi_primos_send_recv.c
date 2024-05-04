@@ -39,8 +39,14 @@ int main(int argc, char *argv[]) {
 	t_final = MPI_Wtime();
 	if(meu_ranque > 0) printf("Tempo de execucao (%d): %1.3f \n", meu_ranque, t_final - t_inicial);
 
-	if(num_procs > 1) {
-		MPI_Reduce(&cont, &total, 1, MPI_INT, MPI_SUM, 0, MPI_COMM_WORLD);
+	if(num_procs > 1 && meu_ranque > 0) {
+		MPI_Send(&cont, 1, MPI_INT, 0, 0, MPI_COMM_WORLD);
+	} else if(num_procs > 1 && meu_ranque == 0) {
+		total = cont;
+		for(i = 1; i < num_procs; i++) {
+			MPI_Recv(&cont, 1, MPI_INT, i, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+			total += cont;
+		}
 	} else {
 		total = cont;
 	}
