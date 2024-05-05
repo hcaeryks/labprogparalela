@@ -37,6 +37,7 @@ int main(int argc, char *argv[])
     MPI_Comm_size(MPI_COMM_WORLD, &num_procs);
     min_procs = n/TAMANHO + 2;
     if(num_procs > min_procs) num_procs = min_procs;
+    MPI_Request request;
     /* Se houver menos que dois processos aborta */
     if (num_procs < 2)
     {
@@ -44,9 +45,9 @@ int main(int argc, char *argv[])
         MPI_Abort(MPI_COMM_WORLD, 1);
         return (1);
     }
-    if (n < 500004)
+    if (n < 1000004)
     {
-        printf("n precisa ser maior que 500004.\n");
+        printf("n precisa ser maior que 1000004.\n");
         MPI_Abort(MPI_COMM_WORLD, 1);
         return (1);
     }
@@ -60,10 +61,12 @@ int main(int argc, char *argv[])
         {
             MPI_Send(&inicio, 1, MPI_INT, dest, tag, MPI_COMM_WORLD);
         }
+        
         /* Fica recebendo as contagens parciais de cada processo */
+        MPI_Irecv(&cont, 1, MPI_INT, MPI_ANY_SOURCE, MPI_ANY_TAG, MPI_COMM_WORLD, &request);
         while (stop < (num_procs - 1))
         {
-            MPI_Recv(&cont, 1, MPI_INT, MPI_ANY_SOURCE, MPI_ANY_TAG, MPI_COMM_WORLD, &estado);
+            MPI_Wait(&request, &estado);
             total += cont;
             dest = estado.MPI_SOURCE;
             if (inicio > n)
@@ -72,18 +75,21 @@ int main(int argc, char *argv[])
                 stop++;
             }
             /* Envia um nvo pedaço com TAMANHO números para o mesmo processo*/
-            MPI_Send(&inicio, 1, MPI_INT, dest, tag, MPI_COMM_WORLD);
+            MPI_Send(&inicio, 1, MPI_INT, dest, tag, MPI_COMM_WORLD);                          
             inicio += TAMANHO;
+            if(stop < (num_procs -1)) MPI_Irecv(&cont, 1, MPI_INT, MPI_ANY_SOURCE, MPI_ANY_TAG, MPI_COMM_WORLD, &request);
         }
     }
     else if (meu_ranque < num_procs)
     {
         /* Cada processo escravo recebe o início do espaço de busca */
+        MPI_Irecv(&inicio, 1, MPI_INT, raiz, MPI_ANY_TAG, MPI_COMM_WORLD, &request);
         while (estado.MPI_TAG != 99)
         {
-            MPI_Recv(&inicio, 1, MPI_INT, raiz, MPI_ANY_TAG, MPI_COMM_WORLD, &estado);
+            MPI_Wait(&request, &estado);
             if (estado.MPI_TAG != 99)
             {
+                MPI_Irecv(&inicio, 1, MPI_INT, raiz, MPI_ANY_TAG, MPI_COMM_WORLD, &request);
                 for (i = inicio, cont = 0; i < (inicio + TAMANHO) && i < n; i += 2)
                     if (primo(i) == 1)
                         cont++;

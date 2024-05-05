@@ -58,7 +58,7 @@ int main(int argc, char *argv[])
     {
         for (dest = 1, inicio = 3; dest < num_procs && inicio < n; dest++, inicio += TAMANHO)
         {
-            MPI_Send(&inicio, 1, MPI_INT, dest, tag, MPI_COMM_WORLD);
+            MPI_Ssend(&inicio, 1, MPI_INT, dest, tag, MPI_COMM_WORLD);
         }
         /* Fica recebendo as contagens parciais de cada processo */
         while (stop < (num_procs - 1))
@@ -72,7 +72,7 @@ int main(int argc, char *argv[])
                 stop++;
             }
             /* Envia um nvo pedaço com TAMANHO números para o mesmo processo*/
-            MPI_Send(&inicio, 1, MPI_INT, dest, tag, MPI_COMM_WORLD);
+            MPI_Ssend(&inicio, 1, MPI_INT, dest, tag, MPI_COMM_WORLD);
             inicio += TAMANHO;
         }
     }
@@ -88,7 +88,7 @@ int main(int argc, char *argv[])
                     if (primo(i) == 1)
                         cont++;
                 /* Envia a contagem parcial para o processo mestre */
-                MPI_Send(&cont, 1, MPI_INT, raiz, tag, MPI_COMM_WORLD);
+                MPI_Ssend(&cont, 1, MPI_INT, raiz, tag, MPI_COMM_WORLD);
             }
         }
         /* Registra o tempo final de execução */

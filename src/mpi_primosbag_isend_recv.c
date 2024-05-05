@@ -37,6 +37,7 @@ int main(int argc, char *argv[])
     MPI_Comm_size(MPI_COMM_WORLD, &num_procs);
     min_procs = n/TAMANHO + 2;
     if(num_procs > min_procs) num_procs = min_procs;
+    MPI_Request request;
     /* Se houver menos que dois processos aborta */
     if (num_procs < 2)
     {
@@ -58,7 +59,8 @@ int main(int argc, char *argv[])
     {
         for (dest = 1, inicio = 3; dest < num_procs && inicio < n; dest++, inicio += TAMANHO)
         {
-            MPI_Send(&inicio, 1, MPI_INT, dest, tag, MPI_COMM_WORLD);
+            MPI_Isend(&inicio, 1, MPI_INT, dest, tag, MPI_COMM_WORLD, &request);
+            MPI_Wait(&request, MPI_STATUS_IGNORE);
         }
         /* Fica recebendo as contagens parciais de cada processo */
         while (stop < (num_procs - 1))
@@ -72,7 +74,8 @@ int main(int argc, char *argv[])
                 stop++;
             }
             /* Envia um nvo pedaço com TAMANHO números para o mesmo processo*/
-            MPI_Send(&inicio, 1, MPI_INT, dest, tag, MPI_COMM_WORLD);
+            MPI_Isend(&inicio, 1, MPI_INT, dest, tag, MPI_COMM_WORLD, &request);
+            MPI_Wait(&request, MPI_STATUS_IGNORE);
             inicio += TAMANHO;
         }
     }
@@ -88,7 +91,8 @@ int main(int argc, char *argv[])
                     if (primo(i) == 1)
                         cont++;
                 /* Envia a contagem parcial para o processo mestre */
-                MPI_Send(&cont, 1, MPI_INT, raiz, tag, MPI_COMM_WORLD);
+                MPI_Isend(&cont, 1, MPI_INT, raiz, tag, MPI_COMM_WORLD, &request);
+                MPI_Wait(&request, MPI_STATUS_IGNORE);
             }
         }
         /* Registra o tempo final de execução */
