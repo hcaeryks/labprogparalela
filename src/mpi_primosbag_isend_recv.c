@@ -103,7 +103,7 @@ int main(int argc, char *argv[])
         t_final = MPI_Wtime();
         total += 1; /* Acrescenta o 2, que é primo */
         //printf("Quant. de primos entre 1 e %d: %d \n", n, total);
-        printf("Tempo de execucao: %1.3f \n", t_final - t_inicial);
+        printf("%1.3f\n", t_final - t_inicial);
     }
     /* Finaliza o programa */
     MPI_Barrier(MPI_COMM_WORLD);
