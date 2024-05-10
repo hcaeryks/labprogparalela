@@ -37,7 +37,7 @@ int main(int argc, char *argv[]) {
 	}
 		
 	t_final = MPI_Wtime();
-	if(meu_ranque > 0) printf("Tempo de execucao (%d): %1.3f \n", meu_ranque, t_final - t_inicial);
+	//if(meu_ranque > 0) printf("Tempo de execucao (%d): %1.3f \n", meu_ranque, t_final - t_inicial);
 
 	if(num_procs > 1 && meu_ranque > 0) {
 		MPI_Ssend(&cont, 1, MPI_INT, 0, 0, MPI_COMM_WORLD);
@@ -56,7 +56,7 @@ int main(int argc, char *argv[]) {
 	if (meu_ranque == 0) {
         total += 1;    /* Acrescenta o dois, que também é primo */
 		printf("Tempo de execucao (%d): %1.3f \n", meu_ranque, t_final - t_inicial);	
-		printf("Quant. de primos entre 1 e n: %d \n", total); 
+		//printf("Quant. de primos entre 1 e n: %d \n", total); 
 	}
 	MPI_Finalize();
 	return(0);
