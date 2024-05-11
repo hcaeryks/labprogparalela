@@ -39,7 +39,7 @@ int main(int argc, char *argv[]) {
 			MPI_Irecv(&results[i-1], 1, MPI_INT, i, 0, MPI_COMM_WORLD, &requests[i-1]);
 		}
 	}
-
+	MPI_Barrier(MPI_COMM_WORLD);
 	for (i = inicio; i <= n; i += salto) 
 	{	
 		if(primo(i) == 1) cont++;
