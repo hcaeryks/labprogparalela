@@ -44,7 +44,7 @@ int main(int argc, char *argv[]) {
 	} else if(num_procs > 1 && meu_ranque == 0) {
 		total = cont;
 		for(i = 1; i < num_procs; i++) {
-			MPI_Recv(&cont, 1, MPI_INT, i, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+			MPI_Recv(&cont, 1, MPI_INT, MPI_ANY_SOURCE, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
 			total += cont;
 		}
 	} else {
